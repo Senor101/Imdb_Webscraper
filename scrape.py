@@ -1,11 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
+
 import random
 import re
 
-movieUrls = ["https://www.imdb.com/title/tt0993846/?pf_rd_m=A2FGELUUNOQJNL&pf_rd_p=ea4e08e1-c8a3-47b5-ac3a-75026647c16e&pf_rd_r=4YRAMY5HXGYB27W8CJME&pf_rd_s=center-1&pf_rd_t=15506&pf_rd_i=moviemeter&ref_=chtmvm_tt_96","https://www.imdb.com/title/tt0111161/?ref_=nv_sr_srsg_0"]
+movieUrls = ["https://www.imdb.com/title/tt0993846/?pf_rd_m=A2FGELUUNOQJNL&pf_rd_p=ea4e08e1-c8a3-47b5-ac3a-75026647c16e&pf_rd_r=4YRAMY5HXGYB27W8CJME&pf_rd_s=center-1&pf_rd_t=15506&pf_rd_i=moviemeter&ref_=chtmvm_tt_96" , "https://www.imdb.com/title/tt0111161/?ref_=nv_sr_srsg_0" , "https://www.imdb.com/title/tt0110912/?ref_=tt_sims_tt_i_2" , "https://www.imdb.com/title/tt0109830/?ref_=tt_sims_tt_t_2","https://www.imdb.com/title/tt1375666/?ref_=tt_sims_tt_t_2"]
 
-response = requests.get(url = "https://www.imdb.com/title/tt0993846/?pf_rd_m=A2FGELUUNOQJNL&pf_rd_p=ea4e08e1-c8a3-47b5-ac3a-75026647c16e&pf_rd_r=4YRAMY5HXGYB27W8CJME&pf_rd_s=center-1&pf_rd_t=15506&pf_rd_i=moviemeter&ref_=chtmvm_tt_96")
+response = requests.get(url = "https://www.imdb.com/title/tt1375666/?ref_=tt_sims_tt_t_2")
 
 soup = BeautifulSoup(response.content,'html.parser')
 
@@ -26,14 +27,13 @@ production_company = production_compani.string
 
 pc = production_company.replace(" ","_")
 newUrl = "https://en.wikipedia.org/wiki/"+pc
-
-
-pcresponse = requests.get(url = newUrl)
-soup2 = BeautifulSoup(pcresponse.content,'html.parser')
-pcadress = soup2.find(class_="infobox-data label").find('a')
-Company_address = pcadress.string
-# # print(pcadress.string)
-# Company_address = "california"
+try:
+    pcresponse = requests.get(url = newUrl)
+    soup2 = BeautifulSoup(pcresponse.content,'html.parser')
+    pcadress = soup2.find(class_="infobox-data label").find('a')
+    Company_address = pcadress.string
+except:
+    Company_address = "california"
 
 
 
@@ -48,17 +48,16 @@ directorName = director.string
 
 
 
-plot_outline = soup.find(class_="sc-16ede01-0 fMPjMP")
+plot_outline = soup.find(class_="sc-16ede01-8 hXeKyz sc-910a7330-11 GYbFb").find(class_="sc-16ede01-2 gXUyNh")
 movieOutline = plot_outline.string
 
 
 
 
-
-movieGenre=[]
+movieGenre=""
 genres = soup.findAll(class_="sc-16ede01-3 bYNgQ ipc-chip ipc-chip--on-baseAlt")
 for genre in genres:
-    movieGenre.append(genre.string)
+    movieGenre+=genre.string+","
 
 
 
@@ -98,7 +97,7 @@ movielength = rest.replace('<!-- -->','')
 movieDetails = {
     "movieName" : movieName,
     "movieCompany" : production_company,
-    "companyAddress":Company_address,
+    # "companyAddress":Company_address,
     "movieRelease" : year_of_release,
     "movieDirector" : directorName,
     "movieOutline" : movieOutline,
