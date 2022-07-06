@@ -3,42 +3,63 @@ from bs4 import BeautifulSoup
 import random
 import re
 
-response = requests.get(url = "https://www.imdb.com/title/tt0111161/?ref_=nv_sr_srsg_0")
+movieUrls = ["https://www.imdb.com/title/tt0993846/?pf_rd_m=A2FGELUUNOQJNL&pf_rd_p=ea4e08e1-c8a3-47b5-ac3a-75026647c16e&pf_rd_r=4YRAMY5HXGYB27W8CJME&pf_rd_s=center-1&pf_rd_t=15506&pf_rd_i=moviemeter&ref_=chtmvm_tt_96","https://www.imdb.com/title/tt0111161/?ref_=nv_sr_srsg_0"]
+
+response = requests.get(url = "https://www.imdb.com/title/tt0993846/?pf_rd_m=A2FGELUUNOQJNL&pf_rd_p=ea4e08e1-c8a3-47b5-ac3a-75026647c16e&pf_rd_r=4YRAMY5HXGYB27W8CJME&pf_rd_s=center-1&pf_rd_t=15506&pf_rd_i=moviemeter&ref_=chtmvm_tt_96")
 
 soup = BeautifulSoup(response.content,'html.parser')
 
+
 movie_name = soup.find(class_="sc-94726ce4-2 khmuXj").find('h1')
-print("MOVIE: " + movie_name.string)
+movieName = movie_name.string
+# print("MOVIE: " + movie_name.string)
+
+
 
 plists = soup.findAll(class_="ipc-page-section ipc-page-section--base celwidget")
-movieDetails = plists[7]
-mdetail = movieDetails.find(class_="sc-f65f65be-0 ktSkVi").findAll(class_="ipc-metadata-list__item ipc-metadata-list-item--link")
+movieDetail = plists[7]
+mdetail = movieDetail.find(class_="sc-f65f65be-0 ktSkVi").findAll(class_="ipc-metadata-list__item ipc-metadata-list-item--link")
 # print(mdetail[3])
-production_company = mdetail[3].find(class_="ipc-metadata-list-item__list-content-item ipc-metadata-list-item__list-content-item--link")
+production_compani = mdetail[3].find(class_="ipc-metadata-list-item__list-content-item ipc-metadata-list-item__list-content-item--link")
+production_company = production_compani.string
 
-print(production_company.string)
+
+pc = production_company.replace(" ","_")
+newUrl = "https://en.wikipedia.org/wiki/"+pc
 
 
-year_of_release = soup.find(class_="ipc-link ipc-link--baseAlt ipc-link--inherit-color sc-8c396aa2-1 WIUyh")
-print("Release: " + year_of_release.string)
+pcresponse = requests.get(url = newUrl)
+soup2 = BeautifulSoup(pcresponse.content,'html.parser')
+pcadress = soup2.find(class_="infobox-data label").find('a')
+Company_address = pcadress.string
+# # print(pcadress.string)
+# Company_address = "california"
+
+
+
+yor = soup.find(class_="ipc-link ipc-link--baseAlt ipc-link--inherit-color sc-8c396aa2-1 WIUyh")
+year_of_release = yor.string
+
 
 
 director = soup.find(class_ = "ipc-metadata-list-item__list-content-item ipc-metadata-list-item__list-content-item--link")
-print("Director: "+ director.string)
+directorName = director.string
 
-print("Outline:")
+
+
+
 plot_outline = soup.find(class_="sc-16ede01-0 fMPjMP")
-print(plot_outline.string)
+movieOutline = plot_outline.string
 
 
 
 
-moviegenre=[]
+
+movieGenre=[]
 genres = soup.findAll(class_="sc-16ede01-3 bYNgQ ipc-chip ipc-chip--on-baseAlt")
 for genre in genres:
-    moviegenre.append(genre.string)
-print("Genre:")
-print(moviegenre)
+    movieGenre.append(genre.string)
+
 
 
 casts = soup.find(class_="ipc-sub-grid ipc-sub-grid--page-span-2 ipc-sub-grid--wraps-at-above-l ipc-shoveler__grid").findAll(class_="sc-36c36dd0-1 QSQgP")
@@ -55,9 +76,11 @@ for char in character:
         moviechar.append(ch)
 
 # cast : character pair
-print("CASTS:")
+castCharacter = []
+# print("CASTS:")
 for x,y in zip(moviecast[:3],moviechar[:3]):
-    print(x + " : "+y)
+    castCharacter.append(x + " : "+y)
+
 
 
 # scraping length of movie
@@ -67,9 +90,19 @@ result = re.search('<div class="ipc-metadata-list-item__content-container">(.*)<
 rest = result.group(1)
 # replacing unwanted comments 
 movielength = rest.replace('<!-- -->','')
-print(movielength)
+# print(movielength)
 
 
 # print(response.status_code)
 
-
+movieDetails = {
+    "movieName" : movieName,
+    "movieCompany" : production_company,
+    "companyAddress":Company_address,
+    "movieRelease" : year_of_release,
+    "movieDirector" : directorName,
+    "movieOutline" : movieOutline,
+    "movieGenre" : movieGenre,
+    "movieCharacter" : castCharacter,
+    "movieLength" : movielength
+}
