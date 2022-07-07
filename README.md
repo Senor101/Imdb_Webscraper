@@ -16,7 +16,7 @@ pip install requests
 *You now can run the dbconnect.py and the code will execute*
 
 ### Playing with bs4
-Our webscraper is the scrape.py script which will scrape the necessary datas from the official imdb site. 
+*Our webscraper is the scrape.py script which will scrape the necessary datas from the official imdb site.*
 ```py
 response = requests.get(url = movieUrl)
 soup = BeautifulSoup(response.content,'html.parser')
