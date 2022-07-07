@@ -27,7 +27,7 @@ def insert_company(name,address):
 
 
 def insert_movie(data):
-    g = data[5]
+    g = data[6]
     args = data[0:5] 
     try:
         cursor = conn.cursor()
@@ -37,8 +37,8 @@ def insert_movie(data):
         conn.commit()
     except Error as error:
         print(error)
-    finally:
-        cursor.close()
-        conn.close()
+    # finally:
+        # cursor.close()
+        # conn.close()
 
 
